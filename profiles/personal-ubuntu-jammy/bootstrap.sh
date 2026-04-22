@@ -92,13 +92,8 @@ apt-get install -y --fix-missing -o Acquire::Retries=3 \
   wbritish
 
 echo "[4/7] Removing bloat..."
-apt-get remove -y \
-  thunderbird \
-  rhythmbox \
-  shotwell \
-  cheese \
-  gnome-games \
-  snap-store
+apt-get remove -y thunderbird rhythmbox shotwell cheese gnome-games || true
+snap remove snap-store || true
 apt-get autoremove -y
 
 echo "[5/7] Applying shell aliases..."
