@@ -105,7 +105,7 @@ echo "[6/7] Installing Snap packages..."
 snap install proton-mail
 
 echo "[7/7] Setting up VirtualBox guest additions..."
-/sbin/rcvboxadd setup
+/sbin/rcvboxadd setup || true
 
 echo "Done."
 echo ""
