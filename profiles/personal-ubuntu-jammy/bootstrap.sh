@@ -11,6 +11,8 @@ CODENAME="jammy"
 rm -f /etc/apt/sources.list.d/proton*.list /etc/apt/sources.list.d/protonvpn*.list
 
 apt-get update -q
+apt-get upgrade -y
+apt-get autoremove -y
 apt-get install -y curl wget gpg apt-transport-https ca-certificates
 
 sed -i 's/Prompt=lts/Prompt=never/' /etc/update-manager/release-upgrades
