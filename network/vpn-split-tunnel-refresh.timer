@@ -1,0 +1,9 @@
+[Unit]
+Description=Periodically refresh VPN split tunnel bypass routes
+
+[Timer]
+OnActiveSec=15min
+OnUnitActiveSec=15min
+
+[Install]
+WantedBy=timers.target

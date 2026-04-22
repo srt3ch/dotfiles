@@ -1,0 +1,6 @@
+[Unit]
+Description=Refresh VPN split tunnel bypass routes
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/vpn-split-tunnel

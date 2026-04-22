@@ -1,0 +1,12 @@
+# Domains to route outside the VPN tunnel (bypass)
+# One domain per line — www. is resolved automatically for each entry
+# Add specific subdomains on separate lines as needed
+
+# Credit monitoring
+creditkarma.com
+
+# Banking / Financial
+chase.com
+navyfederal.org
+capitalone.com
+americanexpress.com

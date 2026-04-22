@@ -21,7 +21,7 @@ apt-get install -y curl wget gpg apt-transport-https ca-certificates
 
 sed -i 's/Prompt=lts/Prompt=never/' /etc/update-manager/release-upgrades || true
 
-echo "[1/8] Adding third-party repositories..."
+echo "[1/9] Adding third-party repositories..."
 
 # Brave Nightly
 curl -fsSL --connect-timeout 30 --max-time 60 \
@@ -60,11 +60,11 @@ if ! command -v twingate &>/dev/null; then
     || echo "  Warning: Twingate install failed — install manually after reboot"
 fi
 
-echo "[2/8] Updating package lists..."
+echo "[2/9] Updating package lists..."
 apt-get update -q \
   || echo "  Warning: apt update had failures — some third-party repos may be unreachable"
 
-echo "[3/8] Installing packages..."
+echo "[3/9] Installing packages..."
 apt-get install -y --fix-missing -o Acquire::Retries=3 \
   -o Dpkg::Options::="--force-confdef" \
   -o Dpkg::Options::="--force-confold" \
@@ -102,6 +102,7 @@ apt-get install -y --fix-missing -o Acquire::Retries=3 \
   python3-pip \
   snmp \
   openssh-client \
+  dnsutils \
   ubuntu-restricted-addons \
   wbritish \
   || echo "  Warning: one or more packages failed — check output above for details"
@@ -109,12 +110,12 @@ apt-get install -y --fix-missing -o Acquire::Retries=3 \
 apt-get install -y -o Acquire::Retries=5 brave-browser-nightly \
   || echo "  Warning: brave-browser-nightly failed — retry manually: sudo apt-get install -y brave-browser-nightly"
 
-echo "[4/8] Removing bloat..."
+echo "[4/9] Removing bloat..."
 apt-get remove -y thunderbird rhythmbox shotwell cheese gnome-games || true
 snap remove snap-store || true
 apt-get autoremove -y || true
 
-echo "[5/8] Configuring GNOME dock and autostart..."
+echo "[5/9] Configuring GNOME dock and autostart..."
 cat > /usr/share/glib-2.0/schemas/99_custom.gschema.override << 'EOF'
 [org.gnome.shell]
 favorite-apps = ['brave-browser-nightly.desktop', 'mullvad-browser.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Terminal.desktop']
@@ -142,16 +143,33 @@ NoDisplay=false
 X-GNOME-Autostart-enabled=true
 EOF
 
-echo "[6/8] Applying shell aliases..."
+echo "[6/9] Setting up VPN split tunnel..."
+SPLIT_BASE="https://raw.githubusercontent.com/srt3ch/dotfiles/main/network"
+curl -fsSL "$SPLIT_BASE/vpn-split-tunnel" -o /usr/local/bin/vpn-split-tunnel \
+  && chmod 755 /usr/local/bin/vpn-split-tunnel \
+  || echo "  Warning: vpn-split-tunnel script fetch failed"
+curl -fsSL "$SPLIT_BASE/99-vpn-split-tunnel" -o /etc/NetworkManager/dispatcher.d/99-vpn-split-tunnel \
+  && chmod 755 /etc/NetworkManager/dispatcher.d/99-vpn-split-tunnel \
+  || echo "  Warning: NM dispatcher fetch failed"
+curl -fsSL "$SPLIT_BASE/vpn-split-tunnel-refresh.service" -o /etc/systemd/system/vpn-split-tunnel-refresh.service \
+  || echo "  Warning: systemd service fetch failed"
+curl -fsSL "$SPLIT_BASE/vpn-split-tunnel-refresh.timer" -o /etc/systemd/system/vpn-split-tunnel-refresh.timer \
+  || echo "  Warning: systemd timer fetch failed"
+curl -fsSL "$SPLIT_BASE/vpn-exclude-domains" -o /etc/vpn-exclude-domains \
+  || echo "  Warning: domain list fetch failed"
+systemctl daemon-reload \
+  || echo "  Warning: systemd daemon-reload failed"
+
+echo "[7/9] Applying shell aliases..."
 curl -fsSL https://raw.githubusercontent.com/srt3ch/dotfiles/main/shell/aliases.sh \
   >> "$(getent passwd "${SUDO_USER:-$USER}" | cut -d: -f6)/.bashrc" \
   || echo "  Warning: aliases fetch failed — add manually from shell/aliases.sh"
 
-echo "[7/8] Installing Snap packages..."
+echo "[8/9] Installing Snap packages..."
 snap install proton-mail \
   || echo "  Warning: proton-mail snap failed — retry manually: snap install proton-mail"
 
-echo "[8/8] Setting up VirtualBox guest additions..."
+echo "[9/9] Setting up VirtualBox guest additions..."
 if lsmod | grep -q vboxguest; then
   echo "  VirtualBox Guest Additions already active — skipping setup."
 else
@@ -165,5 +183,6 @@ echo "Notes:"
 echo "  - Flatpak apps are not included — reinstall those manually after reboot."
 echo "  - Twingate requires re-authentication after install."
 echo "  - Guest additions will activate after reboot."
+echo "  - ProtonVPN: log in, then disable Advanced Kill Switch (keep Standard Kill Switch on)."
 echo ""
 echo "Reboot required. Run: sudo reboot"

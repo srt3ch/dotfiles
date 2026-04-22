@@ -1,0 +1,23 @@
+#!/bin/bash
+
+IFACE="$1"
+EVENT="$2"
+GATEWAY_CACHE="/run/vpn-split-tunnel-gw"
+
+case "$EVENT" in
+    up)
+        GW=$(ip route show dev "$IFACE" | awk '/^default/ {print $3; exit}')
+        if [[ -n "$GW" ]]; then
+            echo "$GW $IFACE" > "$GATEWAY_CACHE"
+            logger -t "vpn-split-tunnel" "Saved gateway: $GW dev $IFACE"
+        fi
+        ;;
+    vpn-up)
+        /usr/local/bin/vpn-split-tunnel
+        systemctl start vpn-split-tunnel-refresh.timer
+        ;;
+    vpn-down)
+        systemctl stop vpn-split-tunnel-refresh.timer 2>/dev/null || true
+        logger -t "vpn-split-tunnel" "VPN down — bypass routes cleared"
+        ;;
+esac
