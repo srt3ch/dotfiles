@@ -57,7 +57,6 @@ apt-get install -y --fix-missing -o Acquire::Retries=3 \
   linux-headers-$(uname -r) \
   virtualbox-guest-utils \
   virtualbox-guest-x11 \
-  brave-browser-nightly \
   mullvad-browser \
   proton-vpn-gnome-desktop \
   signal-desktop \
@@ -91,6 +90,9 @@ apt-get install -y --fix-missing -o Acquire::Retries=3 \
   openssh-client \
   ubuntu-restricted-addons \
   wbritish
+
+apt-get install -y -o Acquire::Retries=5 brave-browser-nightly \
+  || echo "  Warning: brave-browser-nightly failed — retry manually: sudo apt-get install -y brave-browser-nightly"
 
 echo "[4/7] Removing bloat..."
 apt-get remove -y thunderbird rhythmbox shotwell cheese gnome-games || true
