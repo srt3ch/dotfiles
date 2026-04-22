@@ -15,7 +15,7 @@ apt-get install -y curl wget gpg apt-transport-https ca-certificates
 
 sed -i 's/Prompt=lts/Prompt=never/' /etc/update-manager/release-upgrades
 
-echo "[1/4] Adding third-party repositories..."
+echo "[1/7] Adding third-party repositories..."
 
 # Brave Nightly
 curl -fsSLo /usr/share/keyrings/brave-browser-nightly-archive-keyring.gpg \
@@ -46,10 +46,10 @@ if ! command -v twingate &>/dev/null; then
   curl -fsSL "https://binaries.twingate.com/client/linux/install.sh" | bash
 fi
 
-echo "[2/4] Updating package lists..."
+echo "[2/7] Updating package lists..."
 apt-get update -q
 
-echo "[3/4] Installing packages..."
+echo "[3/7] Installing packages..."
 apt-get install -y \
   linux-headers-$(uname -r) \
   virtualbox-guest-utils \
@@ -89,14 +89,24 @@ apt-get install -y \
   ubuntu-restricted-addons \
   wbritish
 
-echo "[4/5] Applying shell aliases..."
+echo "[4/7] Removing bloat..."
+apt-get remove -y \
+  thunderbird \
+  rhythmbox \
+  shotwell \
+  cheese \
+  gnome-games \
+  snap-store
+apt-get autoremove -y
+
+echo "[5/7] Applying shell aliases..."
 curl -fsSL https://raw.githubusercontent.com/srt3ch/dotfiles/main/shell/aliases.sh \
   >> /home/user/.bashrc
 
-echo "[5/5] Installing Snap packages..."
+echo "[6/7] Installing Snap packages..."
 snap install proton-mail
 
-echo "[5/5] Setting up VirtualBox guest additions..."
+echo "[7/7] Setting up VirtualBox guest additions..."
 /sbin/rcvboxadd setup
 
 echo "Done."

@@ -4,18 +4,18 @@ Personal dotfiles and machine bootstrap profiles.
 
 ## Profiles
 
-- `profiles/personal-ubuntu` — Ubuntu 22.04 (Jammy) desktop, VirtualBox
+- `profiles/personal-ubuntu-jammy` — Ubuntu 22.04 (Jammy) desktop, VirtualBox
 
 ## Usage
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/srt3ch/dotfiles/main/profiles/personal-ubuntu/bootstrap.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/srt3ch/dotfiles/main/profiles/personal-ubuntu-jammy/bootstrap.sh | sudo bash
 ```
 
 If `curl` is not installed, use `wget`:
 
 ```bash
-wget -qO- https://raw.githubusercontent.com/srt3ch/dotfiles/main/profiles/personal-ubuntu/bootstrap.sh | sudo bash
+wget -qO- https://raw.githubusercontent.com/srt3ch/dotfiles/main/profiles/personal-ubuntu-jammy/bootstrap.sh | sudo bash
 ```
 
 ## Prerequisites
