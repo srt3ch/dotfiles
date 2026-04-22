@@ -116,7 +116,7 @@ apt-get autoremove -y || true
 
 echo "[5/7] Applying shell aliases..."
 curl -fsSL https://raw.githubusercontent.com/srt3ch/dotfiles/main/shell/aliases.sh \
-  >> /home/user/.bashrc \
+  >> "$(getent passwd "${SUDO_USER:-$USER}" | cut -d: -f6)/.bashrc" \
   || echo "  Warning: aliases fetch failed — add manually from shell/aliases.sh"
 
 echo "[6/7] Installing Snap packages..."
