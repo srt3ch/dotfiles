@@ -1,0 +1,102 @@
+#!/bin/bash
+set -euo pipefail
+
+if [ "$EUID" -ne 0 ]; then
+  echo "Run as root: sudo bash bootstrap.sh"
+  exit 1
+fi
+
+CODENAME="jammy"
+
+rm -f /etc/apt/sources.list.d/proton*.list /etc/apt/sources.list.d/protonvpn*.list
+
+apt-get update -q
+apt-get install -y curl wget gpg apt-transport-https ca-certificates
+
+echo "[1/4] Adding third-party repositories..."
+
+# Brave Nightly
+curl -fsSLo /usr/share/keyrings/brave-browser-nightly-archive-keyring.gpg \
+  https://brave-browser-apt-nightly.s3.brave.com/brave-browser-nightly-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/brave-browser-nightly-archive-keyring.gpg arch=amd64] https://brave-browser-apt-nightly.s3.brave.com/ stable main" \
+  > /etc/apt/sources.list.d/brave-browser-nightly.list
+
+# Mullvad Browser
+curl -fsSLo /usr/share/keyrings/mullvad-keyring.asc \
+  https://repository.mullvad.net/deb/mullvad-keyring.asc
+echo "deb [signed-by=/usr/share/keyrings/mullvad-keyring.asc arch=amd64] https://repository.mullvad.net/deb/stable ${CODENAME} main" \
+  > /etc/apt/sources.list.d/mullvad.list
+
+# Proton (mail + VPN)
+gpg --keyserver keyserver.ubuntu.com --recv-keys EDA3E22630349F1C
+gpg --export EDA3E22630349F1C | tee /usr/share/keyrings/proton-keyring.gpg > /dev/null
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/proton-keyring.gpg] https://repo.protonvpn.com/debian stable main" \
+  > /etc/apt/sources.list.d/proton-vpn-stable.list
+
+# Signal
+wget -qO- https://updates.signal.org/desktop/apt/keys.asc \
+  | gpg --dearmor > /usr/share/keyrings/signal-desktop-keyring.gpg
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/signal-desktop-keyring.gpg] https://updates.signal.org/desktop/apt xenial main" \
+  > /etc/apt/sources.list.d/signal-xenial.list
+
+# Twingate
+if ! command -v twingate &>/dev/null; then
+  curl -fsSL "https://binaries.twingate.com/client/linux/install.sh" | bash
+fi
+
+echo "[2/4] Updating package lists..."
+apt-get update -q
+
+echo "[3/4] Installing packages..."
+apt-get install -y \
+  linux-headers-$(uname -r) \
+  virtualbox-guest-utils \
+  virtualbox-guest-x11 \
+  brave-browser-nightly \
+  mullvad-browser \
+  proton-vpn-gnome-desktop \
+  signal-desktop \
+  build-essential \
+  dkms \
+  flatpak \
+  gnome-shell-extension-appindicator \
+  gir1.2-ayatanaappindicator3-0.1 \
+  libayatana-appindicator3-1 \
+  htop \
+  ibus-table-cangjie-big \
+  ibus-table-cangjie3 \
+  ibus-table-cangjie5 \
+  libchewing3 \
+  libchewing3-data \
+  libm17n-0 \
+  libmarisa0 \
+  libopencc-data \
+  libopencc1.1 \
+  libotf1 \
+  libpinyin-data \
+  libpinyin13 \
+  linux-generic-hwe-22.04 \
+  m17n-db \
+  mtr \
+  net-tools \
+  nmap \
+  pipx \
+  python3-pip \
+  snmp \
+  openssh-client \
+  ubuntu-restricted-addons \
+  wbritish
+
+echo "[4/5] Installing Snap packages..."
+snap install proton-mail
+
+echo "[5/5] Setting up VirtualBox guest additions..."
+/sbin/rcvboxadd setup
+
+echo "Done."
+echo ""
+echo "Notes:"
+echo "  - Reboot before first use."
+echo "  - Flatpak apps are not included — reinstall those manually after reboot."
+echo "  - Twingate requires re-authentication after install."
+echo "  - Guest additions will activate after reboot."
