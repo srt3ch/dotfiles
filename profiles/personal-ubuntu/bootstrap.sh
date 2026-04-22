@@ -96,7 +96,11 @@ echo "[5/5] Setting up VirtualBox guest additions..."
 echo "Done."
 echo ""
 echo "Notes:"
-echo "  - Reboot before first use."
 echo "  - Flatpak apps are not included — reinstall those manually after reboot."
 echo "  - Twingate requires re-authentication after install."
 echo "  - Guest additions will activate after reboot."
+echo ""
+read -rp "Reboot now? [Y/n]: " response
+if [[ "${response,,}" != "n" ]]; then
+  reboot
+fi
