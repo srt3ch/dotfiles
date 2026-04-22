@@ -105,7 +105,11 @@ echo "[6/7] Installing Snap packages..."
 snap install proton-mail
 
 echo "[7/7] Setting up VirtualBox guest additions..."
-/sbin/rcvboxadd setup || true
+if lsmod | grep -q vboxguest; then
+  echo "  VirtualBox Guest Additions already active — skipping setup."
+else
+  /sbin/rcvboxadd setup
+fi
 
 echo "Done."
 echo ""
