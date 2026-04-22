@@ -89,7 +89,11 @@ apt-get install -y \
   ubuntu-restricted-addons \
   wbritish
 
-echo "[4/5] Installing Snap packages..."
+echo "[4/5] Applying shell aliases..."
+curl -fsSL https://raw.githubusercontent.com/srt3ch/dotfiles/main/shell/aliases.sh \
+  >> /home/user/.bashrc
+
+echo "[5/5] Installing Snap packages..."
 snap install proton-mail
 
 echo "[5/5] Setting up VirtualBox guest additions..."
