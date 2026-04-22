@@ -106,13 +106,6 @@ echo "  - Flatpak apps are not included — reinstall those manually after reboo
 echo "  - Twingate requires re-authentication after install."
 echo "  - Guest additions will activate after reboot."
 echo ""
-echo "If provisioned via VirtualBox unattended install, the default user may not be a sudoer."
-echo "To fix, log in as root and run:"
-echo "  su -"
-echo "  usermod -aG sudo <username>"
-echo "  exit"
-echo "Then log out and back in."
-echo ""
 read -rp "Reboot now? [Y/n]: " response
 if [[ "${response,,}" != "n" ]]; then
   reboot
