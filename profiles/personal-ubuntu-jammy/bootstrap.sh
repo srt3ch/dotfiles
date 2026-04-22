@@ -7,6 +7,7 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 CODENAME="jammy"
+export DEBIAN_FRONTEND=noninteractive
 
 rm -f /etc/apt/sources.list.d/proton*.list /etc/apt/sources.list.d/protonvpn*.list
 
