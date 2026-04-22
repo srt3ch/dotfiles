@@ -113,7 +113,4 @@ echo "  - Flatpak apps are not included — reinstall those manually after reboo
 echo "  - Twingate requires re-authentication after install."
 echo "  - Guest additions will activate after reboot."
 echo ""
-read -rp "Reboot now? [Y/n]: " response
-if [[ "${response,,}" != "n" ]]; then
-  reboot
-fi
+echo "Reboot required. Run: sudo reboot"
