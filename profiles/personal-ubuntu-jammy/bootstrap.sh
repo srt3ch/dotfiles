@@ -50,7 +50,7 @@ echo "[2/7] Updating package lists..."
 apt-get update -q
 
 echo "[3/7] Installing packages..."
-apt-get install -y \
+apt-get install -y --fix-missing \
   linux-headers-$(uname -r) \
   virtualbox-guest-utils \
   virtualbox-guest-x11 \
