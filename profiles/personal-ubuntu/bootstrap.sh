@@ -13,6 +13,8 @@ rm -f /etc/apt/sources.list.d/proton*.list /etc/apt/sources.list.d/protonvpn*.li
 apt-get update -q
 apt-get install -y curl wget gpg apt-transport-https ca-certificates
 
+sed -i 's/Prompt=lts/Prompt=never/' /etc/update-manager/release-upgrades
+
 echo "[1/4] Adding third-party repositories..."
 
 # Brave Nightly
