@@ -13,23 +13,29 @@ rm -f /etc/apt/sources.list.d/proton*.list /etc/apt/sources.list.d/protonvpn*.li
 
 apt-get update -q
 apt-get upgrade -y \
+  -o Dpkg::Options::="--force-confdef" \
+  -o Dpkg::Options::="--force-confold" \
   || echo "  Warning: upgrade had failures — check output above"
 apt-get autoremove -y
 apt-get install -y curl wget gpg apt-transport-https ca-certificates
 
-sed -i 's/Prompt=lts/Prompt=never/' /etc/update-manager/release-upgrades
+sed -i 's/Prompt=lts/Prompt=never/' /etc/update-manager/release-upgrades || true
 
 echo "[1/7] Adding third-party repositories..."
 
 # Brave Nightly
-curl -fsSLo /usr/share/keyrings/brave-browser-nightly-archive-keyring.gpg \
-  https://brave-browser-apt-nightly.s3.brave.com/brave-browser-nightly-archive-keyring.gpg
+curl -fsSL --connect-timeout 30 --max-time 60 \
+  -o /usr/share/keyrings/brave-browser-nightly-archive-keyring.gpg \
+  https://brave-browser-apt-nightly.s3.brave.com/brave-browser-nightly-archive-keyring.gpg \
+  || echo "  Warning: Brave keyring fetch failed — brave-browser-nightly repo may not install"
 echo "deb [signed-by=/usr/share/keyrings/brave-browser-nightly-archive-keyring.gpg arch=amd64] https://brave-browser-apt-nightly.s3.brave.com/ stable main" \
   > /etc/apt/sources.list.d/brave-browser-nightly.list
 
 # Mullvad Browser
-curl -fsSLo /usr/share/keyrings/mullvad-keyring.asc \
-  https://repository.mullvad.net/deb/mullvad-keyring.asc
+curl -fsSL --connect-timeout 30 --max-time 60 \
+  -o /usr/share/keyrings/mullvad-keyring.asc \
+  https://repository.mullvad.net/deb/mullvad-keyring.asc \
+  || echo "  Warning: Mullvad keyring fetch failed — mullvad-browser repo may not install"
 echo "deb [signed-by=/usr/share/keyrings/mullvad-keyring.asc arch=amd64] https://repository.mullvad.net/deb/stable ${CODENAME} main" \
   > /etc/apt/sources.list.d/mullvad.list
 
@@ -50,7 +56,8 @@ echo "deb [arch=amd64 signed-by=/usr/share/keyrings/signal-desktop-keyring.gpg] 
 
 # Twingate
 if ! command -v twingate &>/dev/null; then
-  curl -fsSL "https://binaries.twingate.com/client/linux/install.sh" | bash
+  curl -fsSL "https://binaries.twingate.com/client/linux/install.sh" | bash \
+    || echo "  Warning: Twingate install failed — install manually after reboot"
 fi
 
 echo "[2/7] Updating package lists..."
@@ -59,6 +66,8 @@ apt-get update -q \
 
 echo "[3/7] Installing packages..."
 apt-get install -y --fix-missing -o Acquire::Retries=3 \
+  -o Dpkg::Options::="--force-confdef" \
+  -o Dpkg::Options::="--force-confold" \
   linux-headers-$(uname -r) \
   virtualbox-guest-utils \
   virtualbox-guest-x11 \
@@ -103,7 +112,7 @@ apt-get install -y -o Acquire::Retries=5 brave-browser-nightly \
 echo "[4/7] Removing bloat..."
 apt-get remove -y thunderbird rhythmbox shotwell cheese gnome-games || true
 snap remove snap-store || true
-apt-get autoremove -y
+apt-get autoremove -y || true
 
 echo "[5/7] Applying shell aliases..."
 curl -fsSL https://raw.githubusercontent.com/srt3ch/dotfiles/main/shell/aliases.sh \
