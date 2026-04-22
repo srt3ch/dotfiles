@@ -12,7 +12,8 @@ export DEBIAN_FRONTEND=noninteractive
 rm -f /etc/apt/sources.list.d/proton*.list /etc/apt/sources.list.d/protonvpn*.list
 
 apt-get update -q
-apt-get upgrade -y
+apt-get upgrade -y \
+  || echo "  Warning: upgrade had failures — check output above"
 apt-get autoremove -y
 apt-get install -y curl wget gpg apt-transport-https ca-certificates
 
@@ -33,14 +34,17 @@ echo "deb [signed-by=/usr/share/keyrings/mullvad-keyring.asc arch=amd64] https:/
   > /etc/apt/sources.list.d/mullvad.list
 
 # Proton (mail + VPN)
-gpg --keyserver keyserver.ubuntu.com --recv-keys EDA3E22630349F1C
-gpg --export EDA3E22630349F1C | tee /usr/share/keyrings/proton-keyring.gpg > /dev/null
+gpg --keyserver keyserver.ubuntu.com --recv-keys EDA3E22630349F1C \
+  || echo "  Warning: Proton GPG keyserver fetch failed — Proton repo may not install"
+gpg --export EDA3E22630349F1C | tee /usr/share/keyrings/proton-keyring.gpg > /dev/null \
+  || echo "  Warning: Proton GPG export failed"
 echo "deb [arch=amd64 signed-by=/usr/share/keyrings/proton-keyring.gpg] https://repo.protonvpn.com/debian stable main" \
   > /etc/apt/sources.list.d/proton-vpn-stable.list
 
 # Signal
 wget -qO- https://updates.signal.org/desktop/apt/keys.asc \
-  | gpg --dearmor > /usr/share/keyrings/signal-desktop-keyring.gpg
+  | gpg --dearmor > /usr/share/keyrings/signal-desktop-keyring.gpg \
+  || echo "  Warning: Signal key fetch failed — Signal repo may not install"
 echo "deb [arch=amd64 signed-by=/usr/share/keyrings/signal-desktop-keyring.gpg] https://updates.signal.org/desktop/apt xenial main" \
   > /etc/apt/sources.list.d/signal-xenial.list
 
@@ -50,7 +54,8 @@ if ! command -v twingate &>/dev/null; then
 fi
 
 echo "[2/7] Updating package lists..."
-apt-get update -q
+apt-get update -q \
+  || echo "  Warning: apt update had failures — some third-party repos may be unreachable"
 
 echo "[3/7] Installing packages..."
 apt-get install -y --fix-missing -o Acquire::Retries=3 \
@@ -89,7 +94,8 @@ apt-get install -y --fix-missing -o Acquire::Retries=3 \
   snmp \
   openssh-client \
   ubuntu-restricted-addons \
-  wbritish
+  wbritish \
+  || echo "  Warning: one or more packages failed — check output above for details"
 
 apt-get install -y -o Acquire::Retries=5 brave-browser-nightly \
   || echo "  Warning: brave-browser-nightly failed — retry manually: sudo apt-get install -y brave-browser-nightly"
@@ -101,16 +107,19 @@ apt-get autoremove -y
 
 echo "[5/7] Applying shell aliases..."
 curl -fsSL https://raw.githubusercontent.com/srt3ch/dotfiles/main/shell/aliases.sh \
-  >> /home/user/.bashrc
+  >> /home/user/.bashrc \
+  || echo "  Warning: aliases fetch failed — add manually from shell/aliases.sh"
 
 echo "[6/7] Installing Snap packages..."
-snap install proton-mail
+snap install proton-mail \
+  || echo "  Warning: proton-mail snap failed — retry manually: snap install proton-mail"
 
 echo "[7/7] Setting up VirtualBox guest additions..."
 if lsmod | grep -q vboxguest; then
   echo "  VirtualBox Guest Additions already active — skipping setup."
 else
-  /sbin/rcvboxadd setup
+  /sbin/rcvboxadd setup \
+    || echo "  Warning: rcvboxadd setup failed — guest additions may need a manual rerun after reboot"
 fi
 
 echo "Done."
