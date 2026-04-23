@@ -143,7 +143,21 @@ NoDisplay=false
 X-GNOME-Autostart-enabled=true
 EOF
 
-printf '[Desktop Entry]\nType=Application\nName=VirtualBox Client Restart\nExec=bash -c "pkill -f VBoxClient; sleep 1; VBoxClient-all"\nHidden=false\nNoDisplay=false\nX-GNOME-Autostart-enabled=true\n' \
+cat > /usr/local/bin/vboxclient-restart.sh << 'EOF'
+#!/bin/bash
+XAUTH=$(ls /run/user/$(id -u)/.mutter-Xwaylandauth.* 2>/dev/null | head -1)
+[ -n "$XAUTH" ] && export XAUTHORITY="$XAUTH"
+sleep 3
+pkill -f VBoxClient 2>/dev/null
+sleep 1
+exec VBoxClient-all
+EOF
+chmod +x /usr/local/bin/vboxclient-restart.sh
+
+sed -i 's/X-GNOME-Autostart-enabled=true/X-GNOME-Autostart-enabled=false/' \
+  /etc/xdg/autostart/vboxclient.desktop 2>/dev/null || true
+
+printf '[Desktop Entry]\nType=Application\nName=VirtualBox Client Restart\nExec=/usr/local/bin/vboxclient-restart.sh\nHidden=false\nNoDisplay=false\nX-GNOME-Autostart-enabled=true\n' \
   > /etc/xdg/autostart/vboxclient-restart.desktop
 
 echo "[6/9] Setting up VPN split tunnel..."
