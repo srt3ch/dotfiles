@@ -143,15 +143,8 @@ NoDisplay=false
 X-GNOME-Autostart-enabled=true
 EOF
 
-cat > /etc/xdg/autostart/vboxclient-clipboard.desktop << 'EOF'
-[Desktop Entry]
-Type=Application
-Name=VirtualBox Clipboard
-Exec=bash -c "pkill -f 'VBoxClient --clipboard'; sleep 1; VBoxClient --clipboard"
-Hidden=false
-NoDisplay=false
-X-GNOME-Autostart-enabled=true
-EOF
+printf '[Desktop Entry]\nType=Application\nName=VirtualBox Client Restart\nExec=bash -c "pkill -f VBoxClient; sleep 1; VBoxClient-all"\nHidden=false\nNoDisplay=false\nX-GNOME-Autostart-enabled=true\n' \
+  > /etc/xdg/autostart/vboxclient-restart.desktop
 
 echo "[6/9] Setting up VPN split tunnel..."
 SPLIT_BASE="https://raw.githubusercontent.com/srt3ch/dotfiles/main/network"
