@@ -6,10 +6,14 @@ GATEWAY_CACHE="/run/vpn-split-tunnel-gw"
 
 case "$EVENT" in
     up)
-        GW=$(ip route show dev "$IFACE" | awk '/^default/ {print $3; exit}')
-        if [[ -n "$GW" ]]; then
-            echo "$GW $IFACE" > "$GATEWAY_CACHE"
-            logger -t "vpn-split-tunnel" "Saved gateway: $GW dev $IFACE"
+        # Only cache gateway for physical interfaces — virtual/tunnel interfaces
+        # (pvpnksintrf0, proton0, etc.) lack a /sys/class/net/$IFACE/device entry
+        if [[ -e "/sys/class/net/$IFACE/device" ]]; then
+            GW=$(ip route show dev "$IFACE" | awk '/^default/ {print $3; exit}')
+            if [[ -n "$GW" ]]; then
+                echo "$GW $IFACE" > "$GATEWAY_CACHE"
+                logger -t "vpn-split-tunnel" "Saved gateway: $GW dev $IFACE"
+            fi
         fi
         # ProtonVPN uses WireGuard (proton0) — doesn't fire vpn-up
         if [[ "$IFACE" == "proton0" ]]; then
