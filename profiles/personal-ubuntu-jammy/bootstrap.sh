@@ -172,12 +172,25 @@ echo "[8/9] Installing Snap packages..."
 snap install proton-mail \
   || echo "  Warning: proton-mail snap failed — retry manually: snap install proton-mail"
 
-echo "[9/9] Setting up VirtualBox guest additions..."
-if lsmod | grep -q vboxguest; then
-  echo "  VirtualBox Guest Additions already active — skipping setup."
+echo "[9/9] Installing VirtualBox Guest Additions from host ISO..."
+modprobe vboxguest 2>/dev/null || true
+HOST_VER=$(VBoxControl guestproperty get /VirtualBox/HostInfo/VBoxVer 2>/dev/null | awk '/^Value:/{print $2}')
+if [[ -n "$HOST_VER" ]]; then
+  echo "  Detected host VirtualBox $HOST_VER — downloading ISO..."
+  ISO_URL="https://download.virtualbox.org/virtualbox/${HOST_VER}/VBoxGuestAdditions_${HOST_VER}.iso"
+  if curl -fsSL --connect-timeout 30 --max-time 300 "$ISO_URL" -o /tmp/VBoxGuestAdditions.iso; then
+    mount -o loop /tmp/VBoxGuestAdditions.iso /mnt
+    /mnt/VBoxLinuxAdditions.run --nox11 2>&1 || true
+    umount /mnt
+    rm -f /tmp/VBoxGuestAdditions.iso
+    echo "  Guest Additions $HOST_VER installed."
+  else
+    echo "  Warning: ISO download failed for $HOST_VER — falling back to rcvboxadd setup"
+    /sbin/rcvboxadd setup || true
+  fi
 else
-  /sbin/rcvboxadd setup \
-    || echo "  Warning: rcvboxadd setup failed — guest additions may need a manual rerun after reboot"
+  echo "  Warning: Could not detect host VirtualBox version — falling back to rcvboxadd setup"
+  /sbin/rcvboxadd setup || true
 fi
 
 echo "Done."
