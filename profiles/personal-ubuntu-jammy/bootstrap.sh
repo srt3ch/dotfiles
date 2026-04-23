@@ -143,9 +143,6 @@ NoDisplay=false
 X-GNOME-Autostart-enabled=true
 EOF
 
-sed -i 's/#WaylandEnable=false/WaylandEnable=false/' /etc/gdm3/custom.conf \
-  || echo "  Warning: could not disable Wayland in GDM config — dynamic resizing may not work"
-
 echo "[6/9] Setting up VPN split tunnel..."
 SPLIT_BASE="https://raw.githubusercontent.com/srt3ch/dotfiles/main/network"
 curl -fsSL "$SPLIT_BASE/vpn-split-tunnel" -o /usr/local/bin/vpn-split-tunnel \
