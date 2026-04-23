@@ -137,7 +137,7 @@ cat > /etc/xdg/autostart/protonvpn-autostart.desktop << 'EOF'
 [Desktop Entry]
 Type=Application
 Name=ProtonVPN
-Exec=protonvpn-app --minimized
+Exec=protonvpn-app --start-minimized
 Hidden=false
 NoDisplay=false
 X-GNOME-Autostart-enabled=true
