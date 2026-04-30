@@ -16,14 +16,6 @@ Personal dotfiles and machine bootstrap profiles.
 wget -qO- https://raw.githubusercontent.com/srt3ch/dotfiles/main/profiles/base/bootstrap.sh | sudo bash
 ```
 
-### 1a. After cloning the base image
-
-Guest Additions modules need to be re-initialized on each clone before running a profile bootstrap:
-
-```bash
-sudo rcvboxadd setup && sudo reboot
-```
-
 ### 2. Profile (run after base, before rebooting)
 
 **Personal:**
