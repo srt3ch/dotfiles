@@ -57,7 +57,4 @@ curl -fsSL https://raw.githubusercontent.com/srt3ch/dotfiles/main/shell/aliases.
 
 echo "Done."
 echo ""
-echo "Notes:"
-echo "  - Run your profile bootstrap next, then reboot."
-echo ""
-echo "Reboot required. Run: sudo reboot"
+echo "Base image is now ready. Be sure to save this and clone before bootstrapping another profile."
