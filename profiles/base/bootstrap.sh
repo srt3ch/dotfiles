@@ -58,3 +58,6 @@ curl -fsSL https://raw.githubusercontent.com/srt3ch/dotfiles/main/shell/aliases.
 echo "Done."
 echo ""
 echo "Base image is now ready. Be sure to save this and clone before bootstrapping another profile."
+echo ""
+echo "After cloning, run the following on each clone before bootstrapping a profile:"
+echo "  sudo rcvboxadd setup && sudo reboot"
