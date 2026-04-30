@@ -8,6 +8,8 @@ fi
 
 export DEBIAN_FRONTEND=noninteractive
 
+apt-get install -y curl
+
 sed -i 's/Prompt=lts/Prompt=never/' /etc/update-manager/release-upgrades || true
 
 echo "[1/4] Updating system..."
