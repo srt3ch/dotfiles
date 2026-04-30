@@ -37,19 +37,6 @@ gpg --export EDA3E22630349F1C | tee /usr/share/keyrings/proton-keyring.gpg > /de
 echo "deb [arch=amd64 signed-by=/usr/share/keyrings/proton-keyring.gpg] https://repo.protonvpn.com/debian stable main" \
   > /etc/apt/sources.list.d/proton-vpn-stable.list
 
-# Signal
-wget -qO- https://updates.signal.org/desktop/apt/keys.asc \
-  | gpg --dearmor > /usr/share/keyrings/signal-desktop-keyring.gpg \
-  || echo "  Warning: Signal key fetch failed — Signal repo may not install"
-echo "deb [arch=amd64 signed-by=/usr/share/keyrings/signal-desktop-keyring.gpg] https://updates.signal.org/desktop/apt xenial main" \
-  > /etc/apt/sources.list.d/signal-xenial.list
-
-# Twingate
-if ! command -v twingate &>/dev/null; then
-  curl -fsSL "https://binaries.twingate.com/client/linux/install.sh" | bash \
-    || echo "  Warning: Twingate install failed — install manually after reboot"
-fi
-
 echo "[2/6] Updating package lists..."
 apt-get update -q \
   || echo "  Warning: apt update had failures — some third-party repos may be unreachable"
@@ -60,7 +47,6 @@ apt-get install -y --fix-missing -o Acquire::Retries=3 \
   -o Dpkg::Options::="--force-confold" \
   mullvad-browser \
   proton-vpn-gnome-desktop \
-  signal-desktop \
   gnome-shell-extension-appindicator \
   gir1.2-ayatanaappindicator3-0.1 \
   libayatana-appindicator3-1 \
@@ -89,16 +75,6 @@ favorite-apps = ['brave-browser-nightly.desktop', 'mullvad-browser.desktop', 'or
 EOF
 glib-compile-schemas /usr/share/glib-2.0/schemas/ \
   || echo "  Warning: glib-compile-schemas failed — dock favorites may not apply"
-
-cat > /etc/xdg/autostart/signal-desktop-autostart.desktop << 'EOF'
-[Desktop Entry]
-Type=Application
-Name=Signal
-Exec=signal-desktop --start-in-tray
-Hidden=false
-NoDisplay=false
-X-GNOME-Autostart-enabled=true
-EOF
 
 cat > /etc/xdg/autostart/protonvpn-autostart.desktop << 'EOF'
 [Desktop Entry]
