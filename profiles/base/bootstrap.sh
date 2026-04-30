@@ -26,8 +26,6 @@ apt-get install -y --fix-missing -o Acquire::Retries=3 \
   -o Dpkg::Options::="--force-confdef" \
   -o Dpkg::Options::="--force-confold" \
   linux-headers-$(uname -r) \
-  virtualbox-guest-utils \
-  virtualbox-guest-x11 \
   build-essential \
   dkms \
   flatpak \
