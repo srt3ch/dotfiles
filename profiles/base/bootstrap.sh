@@ -30,7 +30,6 @@ apt-get install -y --fix-missing -o Acquire::Retries=3 \
   dkms \
   flatpak \
   htop \
-  linux-generic-hwe-22.04 \
   mtr \
   net-tools \
   nmap \
