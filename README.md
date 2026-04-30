@@ -4,33 +4,52 @@ Personal dotfiles and machine bootstrap profiles.
 
 ## Profiles
 
-- `profiles/personal-ubuntu-jammy` — Ubuntu 22.04 (Jammy) desktop, VirtualBox
+- `profiles/base` — foundation for all VMs; run this first on any fresh Jammy install
+- `profiles/personal-ubuntu-jammy` — personal Ubuntu 22.04 desktop (browsers, Signal, ProtonVPN, dock)
+- `profiles/financial` — financial VM (VPN split tunnel for bypassing IP blocks on financial sites)
 
 ## Usage
 
+### 1. Base (run on every fresh VM)
+
+```bash
+wget -qO- https://raw.githubusercontent.com/srt3ch/dotfiles/main/profiles/base/bootstrap.sh | sudo bash
+```
+
+### 2. Profile (run after base, before rebooting)
+
+**Personal:**
 ```bash
 wget -qO- https://raw.githubusercontent.com/srt3ch/dotfiles/main/profiles/personal-ubuntu-jammy/bootstrap.sh | sudo bash
 ```
 
-If `wget` is not available:
-
+**Financial:**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/srt3ch/dotfiles/main/profiles/personal-ubuntu-jammy/bootstrap.sh | sudo bash
+wget -qO- https://raw.githubusercontent.com/srt3ch/dotfiles/main/profiles/financial/bootstrap.sh | sudo bash
 ```
 
-## What the bootstrap does
+Then reboot:
+```bash
+sudo reboot
+```
 
-1. Adds third-party apt repositories (Brave Nightly, Mullvad, Proton, Signal)
-2. Installs packages — Brave Nightly, Mullvad Browser, ProtonVPN, Signal, build tools, networking tools, Chinese input methods, HWE kernel
+## What each profile does
+
+### Base
+1. Updates and upgrades system packages
+2. Installs core tools — build essentials, networking tools, HWE kernel, VirtualBox guest packages, flatpak, pipx, and more
 3. Removes bloat (Thunderbird, Rhythmbox, Shotwell, Cheese, snap-store)
-4. Configures GNOME dock favorites and autostart for Signal and ProtonVPN
-5. Disables Wayland (required for VirtualBox guest display resizing under X11)
-6. Installs VPN split tunnel — NetworkManager dispatcher, systemd refresh timer, domain bypass list
-7. Appends shell aliases to `.bashrc`
-8. Installs Proton Mail snap
-9. Detects the host VirtualBox version and installs matching Guest Additions from the official ISO (enables clipboard, drag-and-drop, and dynamic window resizing)
+4. Appends shell aliases to `.bashrc`
 
-Reboot is required after the script completes.
+### Personal
+1. Adds third-party apt repositories (Brave Nightly, Mullvad, Proton, Signal)
+2. Installs Twingate
+3. Installs packages — Brave Nightly, Mullvad Browser, ProtonVPN, Signal, GNOME appindicator, Chinese input methods
+4. Configures GNOME dock favorites and autostart for Signal and ProtonVPN
+5. Installs Proton Mail snap
+
+### Financial
+1. Installs VPN split tunnel — NetworkManager dispatcher, systemd refresh timer, domain bypass list
 
 ## Post-reboot checklist
 
@@ -38,7 +57,7 @@ Reboot is required after the script completes.
 - **Twingate** — re-authenticate after install.
 - **Flatpak apps** — not included in the bootstrap; reinstall manually.
 
-## VPN split tunnel
+## VPN split tunnel (financial profile)
 
 Financial and credit sites are routed outside the VPN tunnel to avoid IP-based blocks. Bypass domains are defined in `network/vpn-exclude-domains`:
 
