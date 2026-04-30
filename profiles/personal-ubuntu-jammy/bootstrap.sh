@@ -110,7 +110,7 @@ NoDisplay=false
 X-GNOME-Autostart-enabled=true
 EOF
 
-echo "[5/5] Installing Snap packages..."
+echo "[5/6] Installing Snap packages..."
 snap install proton-mail \
   || echo "  Warning: proton-mail snap failed — retry manually: snap install proton-mail"
 
