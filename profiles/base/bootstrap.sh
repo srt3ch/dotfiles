@@ -70,8 +70,8 @@ ufw --force reset > /dev/null
 ufw --force enable
 
 echo "[5/6] Configuring display for host environment..."
-HOST_OS=$(VBoxControl guestproperty get /VirtualBox/HostInfo/HostOSType 2>/dev/null | awk '/^Value:/{print $2}')
-if [[ "$HOST_OS" == Linux* ]]; then
+VBOX_VER_EXT=$(VBoxControl guestproperty get /VirtualBox/HostInfo/VBoxVerExt 2>/dev/null | awk '/^Value:/{print $2}')
+if [[ "$VBOX_VER_EXT" == *Ubuntu* || "$VBOX_VER_EXT" == *Linux* ]]; then
   sed -i 's/#WaylandEnable=false/WaylandEnable=false/' /etc/gdm3/custom.conf \
     || echo "  Warning: could not disable Wayland in GDM config"
 else
