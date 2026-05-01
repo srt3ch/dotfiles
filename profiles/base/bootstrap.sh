@@ -47,8 +47,13 @@ apt-get remove -y thunderbird rhythmbox shotwell cheese gnome-games || true
 snap remove snap-store || true
 apt-get autoremove -y || true
 
-echo "[4/5] Configuring VBoxDRMClient autostart..."
-cat > /etc/xdg/autostart/vboxdrmclient.desktop << 'EOF'
+echo "[4/5] Configuring display for host environment..."
+HOST_OS=$(VBoxControl guestproperty get /VirtualBox/HostInfo/HostOSType 2>/dev/null | awk '/^Value:/{print $2}')
+if [[ "$HOST_OS" == Linux* ]]; then
+  sed -i 's/#WaylandEnable=false/WaylandEnable=false/' /etc/gdm3/custom.conf \
+    || echo "  Warning: could not disable Wayland in GDM config"
+else
+  cat > /etc/xdg/autostart/vboxdrmclient.desktop << 'EOF'
 [Desktop Entry]
 Type=Application
 Name=VirtualBox DRM Client
@@ -57,6 +62,7 @@ Hidden=false
 NoDisplay=false
 X-GNOME-Autostart-enabled=true
 EOF
+fi
 
 echo "[5/5] Applying shell aliases..."
 curl -fsSL https://raw.githubusercontent.com/srt3ch/dotfiles/main/shell/aliases.sh \
