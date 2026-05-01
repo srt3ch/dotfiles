@@ -11,6 +11,8 @@ export DEBIAN_FRONTEND=noninteractive
 
 rm -f /etc/apt/sources.list.d/proton*.list /etc/apt/sources.list.d/protonvpn*.list
 
+hostnamectl set-hostname personal
+
 echo "[1/6] Adding third-party repositories..."
 
 # Brave Nightly
