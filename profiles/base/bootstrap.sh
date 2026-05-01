@@ -12,7 +12,7 @@ apt-get install -y curl
 
 sed -i 's/Prompt=lts/Prompt=never/' /etc/update-manager/release-upgrades || true
 
-echo "[1/5] Updating system..."
+echo "[1/6] Updating system..."
 apt-get update -q
 apt-get upgrade -y \
   -o Dpkg::Options::="--force-confdef" \
@@ -21,7 +21,7 @@ apt-get upgrade -y \
 apt-get autoremove -y
 apt-get install -y curl wget gpg apt-transport-https ca-certificates
 
-echo "[2/5] Installing base packages..."
+echo "[2/6] Installing base packages..."
 apt-get install -y --fix-missing -o Acquire::Retries=3 \
   -o Dpkg::Options::="--force-confdef" \
   -o Dpkg::Options::="--force-confold" \
@@ -42,12 +42,50 @@ apt-get install -y --fix-missing -o Acquire::Retries=3 \
   wbritish \
   || echo "  Warning: one or more packages failed — check output above"
 
-echo "[3/5] Removing bloat..."
+echo "[3/6] Removing bloat..."
 apt-get remove -y thunderbird rhythmbox shotwell cheese gnome-games || true
 snap remove snap-store || true
 apt-get autoremove -y || true
 
-echo "[4/5] Configuring display for host environment..."
+echo "[4/6] Hardening system..."
+
+SSHD_CONF="/etc/ssh/sshd_config"
+sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin no/' "$SSHD_CONF"
+sed -i 's/^#\?X11Forwarding.*/X11Forwarding no/' "$SSHD_CONF"
+sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication no/' "$SSHD_CONF"
+grep -q '^PubkeyAuthentication' "$SSHD_CONF" \
+  && sed -i 's/^#\?PubkeyAuthentication.*/PubkeyAuthentication yes/' "$SSHD_CONF" \
+  || echo "PubkeyAuthentication yes" >> "$SSHD_CONF"
+systemctl restart ssh 2>/dev/null || systemctl restart sshd 2>/dev/null \
+  || echo "  Warning: could not restart SSH — verify manually"
+
+passwd -l root
+
+systemctl disable --now cups cups.socket cups.path 2>/dev/null || true
+
+apt-get install -y fail2ban
+cat > /etc/fail2ban/jail.local << 'EOF'
+[DEFAULT]
+bantime = 1h
+findtime = 10m
+maxretry = 3
+
+[sshd]
+enabled = true
+bantime = 24h
+maxretry = 3
+EOF
+systemctl enable --now fail2ban
+
+apt-get install -y unattended-upgrades
+dpkg-reconfigure -f noninteractive unattended-upgrades
+systemctl enable --now unattended-upgrades || true
+
+ufw --force reset > /dev/null
+ufw allow 22/tcp
+ufw --force enable
+
+echo "[5/6] Configuring display for host environment..."
 HOST_OS=$(VBoxControl guestproperty get /VirtualBox/HostInfo/HostOSType 2>/dev/null | awk '/^Value:/{print $2}')
 if [[ "$HOST_OS" == Linux* ]]; then
   sed -i 's/#WaylandEnable=false/WaylandEnable=false/' /etc/gdm3/custom.conf \
@@ -64,7 +102,7 @@ X-GNOME-Autostart-enabled=true
 EOF
 fi
 
-echo "[5/5] Applying shell aliases..."
+echo "[6/6] Applying shell aliases..."
 curl -fsSL https://raw.githubusercontent.com/srt3ch/dotfiles/main/shell/aliases.sh \
   >> "$(getent passwd "${SUDO_USER:-$USER}" | cut -d: -f6)/.bashrc" \
   || echo "  Warning: aliases fetch failed — add manually from shell/aliases.sh"
