@@ -49,20 +49,6 @@ apt-get autoremove -y || true
 
 echo "[4/6] Hardening system..."
 
-SSHD_CONF="/etc/ssh/sshd_config"
-if [ -f "$SSHD_CONF" ]; then
-  sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin no/' "$SSHD_CONF"
-  sed -i 's/^#\?X11Forwarding.*/X11Forwarding no/' "$SSHD_CONF"
-  sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication no/' "$SSHD_CONF"
-  grep -q '^PubkeyAuthentication' "$SSHD_CONF" \
-    && sed -i 's/^#\?PubkeyAuthentication.*/PubkeyAuthentication yes/' "$SSHD_CONF" \
-    || echo "PubkeyAuthentication yes" >> "$SSHD_CONF"
-  systemctl restart ssh 2>/dev/null || systemctl restart sshd 2>/dev/null \
-    || echo "  Warning: could not restart SSH — verify manually"
-else
-  echo "  sshd_config not found — skipping SSH hardening (openssh-server not installed)"
-fi
-
 passwd -l root
 
 systemctl disable --now cups cups.socket cups.path 2>/dev/null || true
@@ -72,11 +58,6 @@ cat > /etc/fail2ban/jail.local << 'EOF'
 [DEFAULT]
 bantime = 1h
 findtime = 10m
-maxretry = 3
-
-[sshd]
-enabled = true
-bantime = 24h
 maxretry = 3
 EOF
 systemctl enable --now fail2ban
