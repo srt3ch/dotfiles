@@ -13,7 +13,7 @@ rm -f /etc/apt/sources.list.d/proton*.list /etc/apt/sources.list.d/protonvpn*.li
 
 hostnamectl set-hostname personal
 
-echo "[1/6] Adding third-party repositories..."
+echo "[1/5] Adding third-party repositories..."
 
 # Brave Nightly
 curl -fsSL --connect-timeout 30 --max-time 60 \
@@ -52,11 +52,11 @@ if ! command -v twingate &>/dev/null; then
     || echo "  Warning: Twingate install failed — install manually after reboot"
 fi
 
-echo "[2/6] Updating package lists..."
+echo "[2/5] Updating package lists..."
 apt-get update -q \
   || echo "  Warning: apt update had failures — some third-party repos may be unreachable"
 
-echo "[3/6] Installing packages..."
+echo "[3/5] Installing packages..."
 apt-get install -y --fix-missing -o Acquire::Retries=3 \
   -o Dpkg::Options::="--force-confdef" \
   -o Dpkg::Options::="--force-confold" \
@@ -84,7 +84,7 @@ apt-get install -y --fix-missing -o Acquire::Retries=3 \
 apt-get install -y -o Acquire::Retries=5 brave-browser-nightly \
   || echo "  Warning: brave-browser-nightly failed — retry manually: sudo apt-get install -y brave-browser-nightly"
 
-echo "[4/6] Configuring GNOME dock and autostart..."
+echo "[4/5] Configuring GNOME dock and autostart..."
 cat > /usr/share/glib-2.0/schemas/99_custom.gschema.override << 'EOF'
 [org.gnome.shell]
 favorite-apps = ['brave-browser-nightly.desktop', 'mullvad-browser.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Terminal.desktop']
@@ -112,7 +112,7 @@ NoDisplay=false
 X-GNOME-Autostart-enabled=true
 EOF
 
-echo "[5/6] Installing Snap packages..."
+echo "[5/5] Installing Snap packages..."
 snap install proton-mail \
   || echo "  Warning: proton-mail snap failed — retry manually: snap install proton-mail"
 
