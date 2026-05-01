@@ -10,36 +10,44 @@ Personal dotfiles and machine bootstrap profiles.
 
 ## Usage
 
+All bootstraps must run as root. Switch to root first:
+
+```bash
+sudo su -
+```
+
 ### 1. Base (run on every fresh VM)
 
 ```bash
-wget -qO- https://raw.githubusercontent.com/srt3ch/dotfiles/main/profiles/base/bootstrap.sh | sudo bash
+wget -qO- https://raw.githubusercontent.com/srt3ch/dotfiles/main/profiles/base/bootstrap.sh | bash
 ```
 
-### 2. Profile (run after base, before rebooting)
+### 2. Profile (run after base, on the cloned VM)
 
 **Personal:**
 ```bash
-wget -qO- https://raw.githubusercontent.com/srt3ch/dotfiles/main/profiles/personal-ubuntu-jammy/bootstrap.sh | sudo bash
+wget -qO- https://raw.githubusercontent.com/srt3ch/dotfiles/main/profiles/personal-ubuntu-jammy/bootstrap.sh | bash
 ```
 
 **Financial:**
 ```bash
-wget -qO- https://raw.githubusercontent.com/srt3ch/dotfiles/main/profiles/financial/bootstrap.sh | sudo bash
+wget -qO- https://raw.githubusercontent.com/srt3ch/dotfiles/main/profiles/financial/bootstrap.sh | bash
 ```
 
 Then reboot:
 ```bash
-sudo reboot
+reboot
 ```
 
 ## What each profile does
 
 ### Base
 1. Updates and upgrades system packages
-2. Installs core tools — build essentials, networking tools, HWE kernel, VirtualBox guest packages, flatpak, pipx, and more
+2. Installs core tools — build essentials, networking tools, HWE kernel, flatpak, pipx, and more
 3. Removes bloat (Thunderbird, Rhythmbox, Shotwell, Cheese, snap-store)
-4. Appends shell aliases to `.bashrc`
+4. Hardens system — locks root password, disables CUPS, installs fail2ban, enables ufw (deny all inbound), enables unattended upgrades
+5. Configures display for host environment (Linux vs Windows host)
+6. Appends shell aliases to `.bashrc`
 
 ### Personal
 1. Adds third-party apt repositories (Brave Nightly, Mullvad, Proton, Signal)
