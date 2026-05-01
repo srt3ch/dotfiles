@@ -85,6 +85,8 @@ favorite-apps = ['brave-browser-nightly.desktop', 'mullvad-browser.desktop', 'or
 EOF
 glib-compile-schemas /usr/share/glib-2.0/schemas/ \
   || echo "  Warning: glib-compile-schemas failed — dock favorites may not apply"
+sudo -u "${SUDO_USER:-$USER}" xdg-settings set default-web-browser brave-browser-nightly.desktop 2>/dev/null \
+  || echo "  Warning: could not set Brave as default browser — set manually after reboot"
 
 cat > /etc/xdg/autostart/signal-desktop-autostart.desktop << 'EOF'
 [Desktop Entry]
@@ -117,6 +119,14 @@ if ! command -v twingate &>/dev/null; then
 fi
 
 echo "Done."
+echo ""
+echo "=== Bootstrap Summary ==="
+echo -n "  brave-browser-nightly:     "; command -v brave-browser-nightly &>/dev/null && echo "OK" || echo "WARN — not found"
+echo -n "  mullvad-browser:           "; command -v mullvad-browser &>/dev/null && echo "OK" || echo "WARN — not found"
+echo -n "  signal-desktop:            "; command -v signal-desktop &>/dev/null && echo "OK" || echo "WARN — not found"
+echo -n "  proton-vpn-gnome-desktop:  "; dpkg -l proton-vpn-gnome-desktop &>/dev/null && echo "OK" || echo "WARN — not installed"
+echo -n "  proton-mail (snap):        "; snap list proton-mail &>/dev/null && echo "OK" || echo "WARN — not installed"
+echo -n "  twingate:                  "; command -v twingate &>/dev/null && echo "OK" || echo "WARN — not found"
 echo ""
 echo "Notes:"
 echo "  - Flatpak apps are not included — reinstall those manually after reboot."

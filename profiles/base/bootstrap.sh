@@ -84,4 +84,10 @@ curl -fsSL https://raw.githubusercontent.com/srt3ch/dotfiles/main/shell/aliases.
 
 echo "Done."
 echo ""
+echo "=== Bootstrap Summary ==="
+echo -n "  Root account locked:       "; passwd -S root | grep -q ' L ' && echo "OK" || echo "WARN — check passwd -S root"
+echo -n "  CUPS disabled:             "; systemctl is-active cups &>/dev/null && echo "WARN — cups still active" || echo "OK"
+echo -n "  ufw enabled:               "; ufw status | grep -q 'Status: active' && echo "OK" || echo "WARN — ufw inactive"
+echo -n "  Unattended-upgrades:       "; systemctl is-active unattended-upgrades &>/dev/null && echo "OK" || echo "WARN — not active"
+echo ""
 echo "Base image is now ready. Be sure to save this and clone before bootstrapping another profile."
