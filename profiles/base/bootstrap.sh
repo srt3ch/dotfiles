@@ -53,15 +53,6 @@ passwd -l root
 
 systemctl disable --now cups cups.socket cups.path 2>/dev/null || true
 
-apt-get install -y fail2ban
-cat > /etc/fail2ban/jail.local << 'EOF'
-[DEFAULT]
-bantime = 1h
-findtime = 10m
-maxretry = 3
-EOF
-systemctl enable --now fail2ban
-
 apt-get install -y unattended-upgrades
 dpkg-reconfigure -f noninteractive unattended-upgrades
 systemctl enable --now unattended-upgrades || true
