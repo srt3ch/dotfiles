@@ -82,7 +82,6 @@ dpkg-reconfigure -f noninteractive unattended-upgrades
 systemctl enable --now unattended-upgrades || true
 
 ufw --force reset > /dev/null
-ufw allow 22/tcp
 ufw --force enable
 
 echo "[5/6] Configuring display for host environment..."
