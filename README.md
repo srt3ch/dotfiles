@@ -7,6 +7,7 @@ Personal dotfiles and machine bootstrap profiles.
 - `profiles/base` — foundation for all VMs; run this first on any fresh Jammy install
 - `profiles/personal-ubuntu-jammy` — personal Ubuntu 22.04 desktop (browsers, Signal, ProtonVPN, dock)
 - `profiles/financial` — financial VM (VPN split tunnel for bypassing IP blocks on financial sites)
+- `profiles/service-node` — headless server with SSH hardening, fail2ban, and ufw port 22
 
 ## Usage
 
@@ -34,6 +35,11 @@ wget -qO- https://raw.githubusercontent.com/srt3ch/dotfiles/main/profiles/person
 wget -qO- https://raw.githubusercontent.com/srt3ch/dotfiles/main/profiles/financial/bootstrap.sh | bash
 ```
 
+**Service node:**
+```bash
+wget -qO- https://raw.githubusercontent.com/srt3ch/dotfiles/main/profiles/service-node/bootstrap.sh | bash
+```
+
 Then reboot:
 ```bash
 reboot
@@ -58,6 +64,12 @@ reboot
 
 ### Financial
 1. Installs VPN split tunnel — NetworkManager dispatcher, systemd refresh timer, domain bypass list
+
+### Service node
+1. Installs openssh-server if not present
+2. Hardens sshd — no root login, pubkey auth only, no X11 forwarding, password auth disabled
+3. Installs and configures fail2ban — SSH jail with 24h ban after 3 failed attempts
+4. Opens port 22 in ufw
 
 ## Post-reboot checklist
 
