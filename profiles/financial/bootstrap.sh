@@ -47,9 +47,6 @@ apt-get install -y --fix-missing -o Acquire::Retries=3 \
   -o Dpkg::Options::="--force-confold" \
   mullvad-browser \
   proton-vpn-gnome-desktop \
-  gnome-shell-extension-appindicator \
-  gir1.2-ayatanaappindicator3-0.1 \
-  libayatana-appindicator3-1 \
   ibus-table-cangjie-big \
   ibus-table-cangjie3 \
   ibus-table-cangjie5 \
@@ -64,6 +61,15 @@ apt-get install -y --fix-missing -o Acquire::Retries=3 \
   libpinyin13 \
   m17n-db \
   || echo "  Warning: one or more packages failed — check output above for details"
+
+HOST_OS=$(VBoxControl guestproperty get /VirtualBox/HostInfo/HostOSType 2>/dev/null | awk '/^Value:/{print $2}')
+if [[ "$HOST_OS" != Linux* ]]; then
+  apt-get install -y \
+    gnome-shell-extension-appindicator \
+    gir1.2-ayatanaappindicator3-0.1 \
+    libayatana-appindicator3-1 \
+    || echo "  Warning: appindicator packages failed — tray icons unavailable"
+fi
 
 apt-get install -y -o Acquire::Retries=5 brave-browser-nightly \
   || echo "  Warning: brave-browser-nightly failed — retry manually: sudo apt-get install -y brave-browser-nightly"
