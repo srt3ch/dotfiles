@@ -46,12 +46,6 @@ wget -qO- https://updates.signal.org/desktop/apt/keys.asc \
 echo "deb [arch=amd64 signed-by=/usr/share/keyrings/signal-desktop-keyring.gpg] https://updates.signal.org/desktop/apt xenial main" \
   > /etc/apt/sources.list.d/signal-xenial.list
 
-# Twingate
-if ! command -v twingate &>/dev/null; then
-  curl -fsSL "https://binaries.twingate.com/client/linux/install.sh" | bash \
-    || echo "  Warning: Twingate install failed — install manually after reboot"
-fi
-
 echo "[2/5] Updating package lists..."
 apt-get update -q \
   || echo "  Warning: apt update had failures — some third-party repos may be unreachable"
@@ -112,9 +106,15 @@ NoDisplay=false
 X-GNOME-Autostart-enabled=true
 EOF
 
-echo "[5/5] Installing Snap packages..."
+echo "[5/5] Installing Snap packages and Twingate..."
 snap install proton-mail \
   || echo "  Warning: proton-mail snap failed — retry manually: snap install proton-mail"
+
+# Twingate installed last to avoid DNS interception before snap install
+if ! command -v twingate &>/dev/null; then
+  curl -fsSL "https://binaries.twingate.com/client/linux/install.sh" | bash \
+    || echo "  Warning: Twingate install failed — install manually after reboot"
+fi
 
 echo "Done."
 echo ""
